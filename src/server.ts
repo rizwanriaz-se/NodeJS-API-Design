@@ -2,7 +2,8 @@ import express from "express";
 import router from "./router";
 import morgan from "morgan";
 import cors from "cors";
-
+import { protect } from "./modules/auth";
+import { createUser, signIn } from "./handlers/user";
 const app = express();
 app.use(cors()); //Allow everyone
 app.use(morgan("dev"));
@@ -21,6 +22,9 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello from express" });
 });
 
-app.use("/api", router);
+app.use("/api", protect, router);
+
+app.post("/user", createUser);
+app.post("/signin", signIn);
 
 export default app;
