@@ -1,5 +1,6 @@
 import prisma from "../db";
-import { hashedPassword, createJWT } from "../modules/auth";
+import { hashPassword, createJWT } from "../modules/auth";
+import { comparePasswords } from "../modules/auth";
 
 export const createUser = async (req, res) => {
   const user = await prisma.user.create({
@@ -13,21 +14,20 @@ export const createUser = async (req, res) => {
   res.json({ token });
 };
 
-
-export const signIn = async(req, res) => {
+export const signIn = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
       username: req.body.username,
     },
-  })
+  });
 
   if (user) {
-    const isValid = await comparePasswords(req.body.password, user.password)
+    const isValid = await comparePasswords(req.body.password, user.password);
     if (isValid) {
-      const token = createJWT(user)
-      res.json({ token })
+      const token = createJWT(user);
+      res.json({ token });
     } else {
-      res.status(401).json({ message: "Invalid credentials" })
+      res.status(401).json({ message: "Invalid credentials" });
     }
   }
-}
+};
